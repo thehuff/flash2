@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" style="height: 100%">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,66 +8,101 @@
 
     <title>FLASH CARDS</title>
   </head>
-  <body class="bg-light">
-    <div class="px-4 py-3 my-3 fs-5 text-center">
+  <body class="bg-light" style="height: 100%">
+    <div class="px-4 py-3 my-3">
+      <div class="form-check form-switch form-check-inline">
+        <input class="form-check-input js-english-first-switch" type="checkbox" id="flexSwitchCheckDefault">
+        <label class="form-check-label" for="flexSwitchCheckDefault">English first</label>
+      </div>
+    </div>
+    <div class="px-4 py-3 my-3 fs-5 text-center js-main-content" style="height: 100%">
       <div class="js-card col-lg-6 mx-auto bg-white border rounded-3">
         <p class="mb-4">
           <div class="fs-6 text-muted">
-            <span class="js-card-face-kana"></span><span>&nbsp;</span>
+            <span class="js-card-face-jp"></span><span>&nbsp;</span>
           </div>
           <div class="fs-1">
-            <span class="js-card-face-jp"></span><span>&nbsp;</span>
+            <span class="js-card-face-kana"></span><span>&nbsp;</span>
           </div>
         </p>
         <p class="mb-4">
           <div><span class="js-card-face-en"></span><span>&nbsp;</span></div>
-          <div class="fs-6 fw-lighter text-muted"><span class="js-card-face-pos"></span><span>&nbsp;</span></div>
+          <div class="fs-6 fw-lighter text-muted"><span>&nbsp;</span></div>
         </p>
       </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script> -->
-    <!-- <script> window.addEventListener('load', function() { new Darkmode().showWidget(); }); </script> -->
+    <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+    <script> window.addEventListener('load', function() { new Darkmode({ bottom: "unset", top: "10px" }).showWidget(); }); </script>
 
     <script type="text/javascript">
       (function () {
         var cardElement = document.querySelector(".js-card"),
-          deck = decks()["mnn1"];
+          deck = null,
+          englishFirst = false;
 
-        cardElement.addEventListener("mousedown", nextCard);
+        document.querySelector(".js-main-content").addEventListener("mousedown", nextCard);
+        document.querySelector(".js-english-first-switch").addEventListener("input", changeOrder);
+
+        function loadDeck() {
+          deck = decks()["mnn1"]
+        }
 
         function nextCard() {
           var cardIndex = Math.floor(Math.random() * deck.length);
           flipCard(deck[cardIndex]);
+
           deck.splice(cardIndex, 1);
+          console.log(deck.length);
+
+          if (deck.length == 0) {
+            loadDeck();
+          }
         }
 
         function flipCard(card) {
           var enElement = document.querySelector(".js-card-face-en"),
             jpElement = document.querySelector(".js-card-face-jp"),
-            kanaElement = document.querySelector(".js-card-face-kana"),
-            posElement = document.querySelector(".js-card-face-pos");
+            kanaElement = document.querySelector(".js-card-face-kana");
 
           if (cardElement.dataset.face == "front") {
             cardElement.dataset["face"] = "back"
           } else {
             cardElement.dataset.face = "front"
 
-            kanaElement.textContent = card["kana"];
-            jpElement.textContent = card["jp"];
+            kanaElement.textContent = card["kana"] || card["jp"];
+            jpElement.textContent =  card["kana"] ? card["jp"] : "";
             enElement.textContent = card["en"];
-            posElement.textContent = card["pos"];
           }
 
-          enElement.classList.toggle("visually-hidden");
-          posElement.classList.toggle("visually-hidden");
+          if (englishFirst) {
+            kanaElement.classList.toggle("visually-hidden");
+            jpElement.classList.toggle("visually-hidden");
+          } else {
+            enElement.classList.toggle("visually-hidden");
+          }
         }
 
+        function changeOrder() {
+          var enElement = document.querySelector(".js-card-face-en"),
+            jpElement = document.querySelector(".js-card-face-jp"),
+            kanaElement = document.querySelector(".js-card-face-kana");
+
+          englishFirst = document.querySelector(".js-english-first-switch").checked;
+
+          cardElement.dataset.face = "front"
+          kanaElement.classList.toggle("visually-hidden", englishFirst);
+          jpElement.classList.toggle("visually-hidden", englishFirst);
+          enElement.classList.toggle("visually-hidden", !englishFirst);
+        }
+
+        loadDeck();
         nextCard();
+        changeOrder();
 
         function decks() {
-          return {"mnn1": [{"jp":"あのひと","en":"that person; he; she"},{"kana":"学生","jp":"せんせい","en":"teacher"},{"jp":"きょうし","en":"teacher (one's own job)"},{"kana":"学生","jp":"がくせい","en":"student (university)"},{"kana":"会社員","jp":"かいしゃいん","en":"company employee"},{"kana":"銀行","jp":"ぎんこう","en":"bank"},{"kana":"医者","jp":"いしゃ","en":"medical doctor"},{"kana":"大学","jp":"だいがく","en":"university"},{"kana":"病院","jp":"びょういん","en":"hospital"},{"kana":"電気","jp":"でんき","en":"electricity; (electric) light"},{"kana":"誰","jp":"だれ","en":"who"},{"kana":"何方","jp":"どなた","en":"[hon.] who"},{"jp":"おいくつ","en":"[hon.] how old? (lit. how many?)"},{"jp":"これ","en":"this (here) "},{"jp":"それ","en":"that (near you) "},{"jp":"あれ","en":"that (over there) "},{"jp":"この~","en":"this (thing here) "},{"jp":"その~","en":"that (thing near you) "},{"jp":"あの~","en":"that (thing over there) "},{"jp":"ほん","en":"book "},{"jp":"じしょ","en":"dictonary "},{"jp":"しんぶん","en":"magazine "},{"jp":"ざっし","en":"newspaper "},{"jp":"ノート","en":"notebook "},{"jp":"てちょう","en":"(pocket) notebook "},{"jp":"めいし","en":"business card "},{"jp":"カード","en":"card "},{"jp":"えんぴつ","en":"pencil "},{"jp":"かぎ","en":"key "},{"jp":"とけい","en":"watch; clock "},{"jp":"かさ","en":"umbrella "},{"jp":"かばん","en":"bag "},{"jp":"テレビ","en":"television "},{"jp":"ラジオ","en":"radio"},{"jp":"カメラ","en":"camera"},{"jp":"コンピュータ","en":"computer"},{"jp":"じどうしゃ","en":"automobile"},{"jp":"つくえ","en":"desk"},{"jp":"いす","en":"chair"},{"jp":"チョコレート","en":"chocolate"},{"jp":"コーヒー","en":"coffee"},{"jp":"えいご","en":"English (language)"},{"jp":"にほんご","en":"Japanese (language)"},{"jp":"~ご","en":"~language"},{"jp":"なに","en":"what"},{"jp":"そう","en":"so"},{"jp":"そうですか","en":"I see; is that so?"},{"jp":"あのう","en":"say; well; errr..."},{"jp":"どうぞ","en":"please; here you are (offering something)"},{"jp":"どうも","en":"well, thanks"},{"jp":"ありがとう","en":"thank you"}]};
+          return {"mnn1": [{"en":"we; us","jp":"私たち"},{"en":"you","jp":"貴方"},{"en":"that person","jp":"あの人"},{"en":"[hon.] that person","jp":"あの方"},{"en":"* suffix for nationality; race or origin","jp":"〜人"},{"en":"teacher; instructor","kana":"せんせい","jp":"先生"},{"en":"teacher (classroom)","kana":"きょうし"},{"en":"student (university)","jp":"学生"},{"en":"medical doctor; physician","kana":"いしゃ","jp":"医者"},{"en":"university; college","jp":"大学"},{"en":"hospital","kana":"びょういん","jp":"病院"},{"en":"electricity; (electric) light","jp":"電気"},{"en":"who","kana":"だれ","jp":"誰"},{"en":"[hon.] who","kana":"どなた","jp":"何方"},{"en":"[hon.] how old?","kana":"おいくつ"},{"en":"that (near you)","kana":"それ"},{"en":"that (over there)","kana":"あれ"},{"en":"this (thing here)","kana":"この〜"},{"en":"that (thing near you)","kana":"その〜"},{"en":"that (thing over there)","kana":"あの〜"},{"en":"book","jp":"本"},{"en":"dictionary","kana":"じしょ","jp":"辞書"},{"en":"magazine","kana":"ざっし"},{"en":"newspaper","kana":"しんぶん"},{"en":"(pocket) notebook; memo pad","kana":"てちょう"},{"en":"business card","kana":"めいし","jp":"名刺"},{"en":"card","kana":"カード"},{"en":"key","kana":"かぎ"},{"en":"watch; clock;","kana":"とけい","jp":"時計"},{"en":"umbrella; parasol","kana":"かさ","jp":"傘"},{"en":"bag","kana":"かばん","jp":"鞄"},{"en":"computer","kana":"コンピューター"},{"en":"automobile","kana":"じどうしゃ","jp":"自動車"},{"en":"desk","kana":"つくえ","jp":"机"},{"en":"chair","kana":"いす","jp":"椅子"},{"en":"what","kana":"なに","jp":"何"},{"en":"so","kana":"そう"},{"en":"please; here you are (when offering someone something)","kana":"どうぞ"},{"en":"well thanks","jp":"どうも"},{"en":"thank you","kana":"ありがとう","jp":"有り難う"},{"en":"here (this place)","kana":"ここ"},{"en":"there (that place near you)","kana":"そこ"},{"en":"there (that place over there)","kana":"あそこ"},{"en":"where; what place?","kana":"どこ"},{"en":"this way; [hon.] this place","kana":"こちら"},{"en":"that way; [hon.] that place (near you)","kana":"そちら"},{"en":"that way; [hon.] that place (over there)","kana":"あちら"},{"en":"which way; [hon.] where","kana":"どちら"},{"en":"classroom","kana":"きょうしつ"},{"en":"dining hall; canteen; cafeteria","kana":"しょくどう"},{"en":"office","kana":"じむしょ"},{"en":"conference room; council room","kana":"かいぎしつ"},{"en":"reception (desk)","kana":"うけつけ"},{"en":"lobby","kana":"ロビー"},{"en":"room","kana":"へや"},{"en":"toilet; restroom","kana":"トイレ"},{"en":"bathroom; restroom","kana":"おてあらい"},{"en":"staircase","kana":"かいだん"},{"en":"elevator","kana":"エレベーター"},{"en":"escalator","kana":"エスカレーター"},{"en":"country","kana":"くに","jp":"国"},{"en":"company","kana":"かいしゃ","jp":"会社"},{"en":"house; home (one's own)","kana":"うち","jp":"家"},{"en":"telephone; telephone call","kana":"でんわ","jp":"電話"},{"en":"shoes; boots; footwear","kana":"くつ"},{"en":"tie; neck tie","kana":"ネクタイ"},{"en":"wine","kana":"ワイン"},{"en":"tobacco; cigarette","kana":"たばこ"},{"en":"sales floor; counter (in shop)","kana":"うりば"},{"en":"basement; cellar","kana":"ちか","jp":"地下"},{"en":"* counter for floors in a building","kana":"〜かい"},{"en":"which floor?","kana":"なんがい","jp":"何階"},{"en":"Japanese Yen; ¥","kana":"〜えん","jp":"〜円"},{"en":"how much/many?","kana":"いくら"},{"en":"100; hundred","kana":"ひゃく","jp":"百"},{"en":"1000; thousand","kana":"せん","jp":"千"},{"en":"10000; ten thousand","kana":"まん","jp":"万"},{"en":"excuse me; pardon me; I'm sorry","kana":"すみません"}]};
         }
       })();
     </script>
